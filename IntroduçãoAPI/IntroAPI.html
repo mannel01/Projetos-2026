@@ -1,38 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="IntroAPI.css">
+  <meta charset="UTF-8">
+  <title>CRUD com JSONPlaceholder</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    input, textarea { display: block; margin: 5px 0 10px; width: 300px; }
+    button { margin-bottom: 15px; }
+    .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+  </style>
 </head>
-
 <body>
-    <h1>Introdução a API</h1>
 
-    <button onclick="carregarTudo()">Carregar tudo</button>
+  <h1>CRUD - JSONPlaceholder</h1>
 
-    <form action="IntroAPI.js" method="POST">
-        <input type="text" id="namead">
-        <input type="text" id="emailad">
-        <button onclick="adicionar()">Adicionar</button>
-    </form>
-    
-    
-    <form action="IntroAPI.js" method="PUT">
-        <input type="number" id="idat">
-        <input type="text" id="nameat">
-        <input type="text" id="emailat">
-        <button onclick="atualizar()">Atualizar</button>
-    </form>
+  <button onclick="buscarPosts()">Buscar Posts</button>
+
+  <h2>Adicionar Post (POST)</h2>
+  <form onsubmit="adicionarPost(event)">
+    <input type="text" id="novoTitulo" placeholder="Título" required>
+    <textarea id="novoCorpo" placeholder="Conteúdo" required></textarea>
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <h2>Editar Post (PUT)</h2>
+  <form onsubmit="editarPost(event)">
+    <input type="number" id="editId" placeholder="ID do Post" required>
+    <input type="text" id="editTitulo" placeholder="Novo Título" required>
+    <textarea id="editCorpo" placeholder="Novo Conteúdo" required></textarea>
+    <button type="submit">Editar</button>
+  </form>
+
+  <h2>Excluir Post (DELETE)</h2>
+  <form onsubmit="excluirPost(event)">
+    <input type="number" id="deleteId" placeholder="ID do Post" required>
+    <button type="submit">Excluir</button>
+  </form>
+
+  <h2>Lista de Posts</h2>
+  <div id="posts"></div>
+
+<script>
+const apiUrl = "https://jsonplaceholder.typicode.com/posts";
 
 
-    <form action="IntroAPI.js" method="DELETE">
-        <input type="number" id="iddel">
-        <button onclick="deletar()">Deletar</button>
-    </form>
+async function buscarPosts() {
+  const response = await fetch(apiUrl);
+  console.log("GET Status:", response.status);
 
-    <script src="IntroAPI.js"></script>
+  const posts = await response.json();
+  const container = document.getElementById("posts");
+  container.innerHTML = "";
+
+  posts.slice(0, 10).forEach(post => {
+    const div = document.createElement("div");
+    div.className = "post";
+    div.innerHTML = `
+      <h3>${post.id} - ${post.title}</h3>
+      <p>${post.body}</p>
+    `;
+    container.appendChild(div);
+  });
+}
+
+
+async function adicionarPost(event) {
+  event.preventDefault();
+
+  const titulo = document.getElementById("novoTitulo").value;
+  const corpo = document.getElementById("novoCorpo").value;
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      title: titulo,
+      body: corpo,
+      userId: 1
+    })
+  });
+
+  console.log("POST Status:", response.status);
+
+  const data = await response.json();
+  alert("Post criado com ID: " + data.id);
+}
+
+
+async function editarPost(event) {
+  event.preventDefault();
+
+  const id = document.getElementById("editId").value;
+  const titulo = document.getElementById("editTitulo").value;
+  const corpo = document.getElementById("editCorpo").value;
+
+  const response = await fetch(`${apiUrl}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      id: id,
+      title: titulo,
+      body: corpo,
+      userId: 1
+    })
+  });
+
+  console.log("PUT Status:", response.status);
+
+  const data = await response.json();
+  alert("Post atualizado: " + JSON.stringify(data));
+}
+
+
+async function excluirPost(event) {
+  event.preventDefault();
+
+  const id = document.getElementById("deleteId").value;
+
+  const response = await fetch(`${apiUrl}/${id}`, {
+    method: "DELETE"
+  });
+
+  console.log("DELETE Status:", response.status);
+
+  alert("Post com ID " + id + " removido (simulado).");
+}
+</script>
+
 </body>
 </html>
