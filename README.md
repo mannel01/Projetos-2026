@@ -1,2 +1,2 @@
-# Projetos-2026
-Projetos feitos no ensino médio realizados sozinho ou em conjunto com um colega
+# Introdução a API
+Projeto html simples com API pronta, para compreensão de como funciona e prática inicial.
